@@ -1,0 +1,12 @@
+# Node modulok (ezeket felesleges feltölteni, mert hatalmasak)
+node_modules/
+server/node_modules/
+client/node_modules/
+
+# Titkos környezeti változók (EZ VÉD MEG A HACKEREKTŐL!)
+.env
+server/.env
+
+# Egyéb felesleges fájlok
+dist/
+.DS_Store
