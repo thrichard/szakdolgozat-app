@@ -27,5 +27,5 @@ A projekt futtatásához telepített **Node.js** és egy **MongoDB** adatbázis 
 
 ### 1. Tároló letöltése (Clone)
 ```bash
-git clone [https://github.com/TE_NEVED/TE_REPO_NEVED.git](https://github.com/TE_NEVED/TE_REPO_NEVED.git)
+git clone [https://github.com/thrichard/szakdolgozat-app.git](https://github.com/thrichard/szakdolgozat-app.git)
 cd szakdolgozat-app
