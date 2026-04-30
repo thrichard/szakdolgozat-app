@@ -1,9 +1,3 @@
-/**
- * Regisztrációs űrlap komponense.
- * Felelős az új felhasználói adatok begyűjtéséért, a lokális állapot (state) kezeléséért,
- * és az adatok aszinkron továbbításáért a backend API felé.
- */
-
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
@@ -11,25 +5,24 @@ function Register() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState('student'); // Alapértelmezetten diák
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); 
     setError('');
 
     try {
-      // POST kérés iniciálása az autentikációs végpontra
       const response = await fetch('http://localhost:5000/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, email, password })
+        body: JSON.stringify({ username, email, password, role }) // Itt küldjük el a szervernek a szerepkört is
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        // Sikeres regisztráció esetén átirányítás a bejelentkező felületre
         navigate('/login');
       } else {
         setError(data.message || 'Hiba történt a regisztráció során.');
@@ -75,8 +68,22 @@ function Register() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              minLength="6"
             />
           </div>
+          
+          <div>
+            <label className="block text-gray-700 text-sm font-bold mb-2">Szerepkör</label>
+            <select 
+              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+            >
+              <option value="student">Diák</option>
+              <option value="teacher">Tanár</option>
+            </select>
+          </div>
+
           <button 
             type="submit" 
             className="w-full bg-blue-600 text-white font-bold py-2 rounded-lg hover:bg-blue-700 transition"
