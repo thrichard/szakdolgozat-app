@@ -1,21 +1,9 @@
-/**
- * Oktatói irányítópult (Dashboard) komponense.
- * Központi navigációs felület a tanári jogosultsággal rendelkező felhasználók számára.
- * Biztosítja a hozzáférést a tananyag-feltöltéshez, kvízkészítéshez és az osztálynaplóhoz,
- * valamint kezeli a biztonságos munkamenet-befejezést (kijelentkezés).
- */
-
 import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
 function TeacherDashboard() {
   const navigate = useNavigate();
 
-  /**
-   * Munkamenet befejezése (Logout).
-   * Eltávolítja a hitelesítési tokent a lokális tárolóból (localStorage)
-   * és átirányítja a felhasználót a bejelentkezési felületre.
-   */
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate('/login');
