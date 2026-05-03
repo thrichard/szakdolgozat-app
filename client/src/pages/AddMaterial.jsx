@@ -41,7 +41,7 @@ function AddMaterial() {
         
         // 2 másodperc múlva visszadobjuk a tanárt a műszerfalra
         setTimeout(() => {
-          navigate('/teacher-dashboard'); // Vagy amilyen útvonalon a dashboardod elérhető
+          navigate('/teacher'); 
         }, 2000);
       } else {
         setError(data.message || 'Hiba történt a feltöltés során.');
