@@ -28,7 +28,7 @@ function TeacherDashboard() {
             Ez az oktatói irányítópult. Itt kezelheti a diákok tananyagait, hozhat létre új vizsgákat, és ellenőrizheti az eredményeket.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Link to="/add-material" className="p-6 bg-blue-50 rounded-xl border border-blue-100 hover:bg-blue-100 transition block text-center shadow-sm">
               <div className="text-4xl mb-3">📚</div>
               <h3 className="font-bold text-blue-700 mb-2">Tananyag feltöltése</h3>
@@ -45,6 +45,12 @@ function TeacherDashboard() {
               <div className="text-4xl mb-3">📊</div>
               <h3 className="font-bold text-orange-700 mb-2">Osztálynapló</h3>
               <p className="text-sm text-orange-600">Az összes diák kitöltött vizsgájának és osztályzatának megtekintése.</p>
+            </Link>
+
+            <Link to="/manage-quizzes" className="p-6 bg-teal-50 rounded-xl border border-teal-100 hover:bg-teal-100 transition block text-center shadow-sm">
+              <div className="text-4xl mb-3">⚙️</div>
+              <h3 className="font-bold text-teal-700 mb-2">Kvízeim kezelése</h3>
+              <p className="text-sm text-teal-600">Eddigi kvízek listázása, módosítása és törlése.</p>
             </Link>
           </div>
         </div>

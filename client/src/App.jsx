@@ -10,6 +10,7 @@ import TeacherDashboard from './pages/TeacherDashboard';
 import AddMaterial from './pages/AddMaterial';
 import CreateQuiz from './pages/CreateQuiz';
 import AllResults from './pages/AllResults';
+import ManageQuizzes from './pages/ManageQuizzes';
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
         <Route path="/add-material" element={<AddMaterial />} />
         <Route path="/create-quiz" element={<CreateQuiz />} />
         <Route path="/all-results" element={<AllResults />} />
+        <Route path="/manage-quizzes" element="{<ManageQuizzes"/>} />
       </Routes>
     </Router>
   );
