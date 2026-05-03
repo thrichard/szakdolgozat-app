@@ -1,10 +1,3 @@
-/**
- * Dinamikus kvízösszeállító komponens.
- * Lehetővé teszi komplex adatszerkezetek (kérdések, opciók, helyes válaszok indexe)
- * kliensoldali összeállítását lokális állapotkezeléssel (state array), majd azok
- * beküldését a REST API felé véglegesítés céljából.
- */
-
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
@@ -13,27 +6,17 @@ function CreateQuiz() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [difficulty, setDifficulty] = useState('medium');
-  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
-  // Komplex állapot: Kérdések tömbje (Array of objects)
   const [questions, setQuestions] = useState([
     { questionText: '', options: ['', '', '', ''], correctAnswer: 0 }
   ]);
 
-  /**
-   * Új elem hozzáadása a kérdések tömbjéhez az immutabilitás elvének megtartásával.
-   */
   const addQuestion = () => {
     setQuestions([...questions, { questionText: '', options: ['', '', '', ''], correctAnswer: 0 }]);
   };
 
-  /**
-   * Specifikus kérdés vagy opció állapotának módosítása a megadott index alapján.
-   * @param {number} index - A módosítandó kérdés indexe a tömbben.
-   * @param {string} field - A frissítendő mező kulcsa.
-   * @param {any} value - Az új érték.
-   * @param {number|null} optIndex - (Opcionális) A válaszlehetőség indexe, amennyiben opciót módosítunk.
-   */
   const updateQuestion = (index, field, value, optIndex = null) => {
     const newQuestions = [...questions];
     if (optIndex !== null) {
@@ -44,11 +27,10 @@ function CreateQuiz() {
     setQuestions(newQuestions);
   };
 
-  /**
-   * Kvíz adatstruktúrájának szerializálása (JSON) és továbbítása a szervernek.
-   */
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    setSuccess('');
     const token = localStorage.getItem('token');
 
     try {
@@ -61,15 +43,16 @@ function CreateQuiz() {
         body: JSON.stringify({ title, description, difficulty, questions })
       });
 
+      const data = await response.json();
+
       if (response.ok) {
-        alert("Kvíz adatszerkezete sikeresen validálva és mentve. 🎉");
-        navigate('/teacher');
+        setSuccess('Kvíz sikeresen létrehozva! 🎉');
+        setTimeout(() => navigate('/teacher'), 2000);
       } else {
-        const data = await response.json();
-        setMessage(data.message || "Validációs hiba a mentés során.");
+        setError(data.message || 'Hiba történt a mentés során.');
       }
     } catch (err) {
-      setMessage("Hálózati hiba: Nem sikerült csatlakozni a szerverhez.");
+      setError('Hálózati hiba: Nem sikerült csatlakozni a szerverhez.');
     }
   };
 
@@ -81,8 +64,10 @@ function CreateQuiz() {
           <Link to="/teacher" className="text-indigo-600 hover:underline">Vissza</Link>
         </div>
 
+        {error && <div className="bg-red-50 text-red-600 p-3 rounded mb-4 text-sm font-bold">{error}</div>}
+        {success && <div className="bg-green-50 text-green-600 p-3 rounded mb-4 text-sm font-bold">{success}</div>}
+
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Alapadatok bekérése */}
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
             <div className="grid gap-4">
               <input 
@@ -106,7 +91,6 @@ function CreateQuiz() {
             </div>
           </div>
 
-          {/* Dinamikus kérdések listájának renderelése */}
           {questions.map((q, qIndex) => (
             <div key={qIndex} className="bg-white p-6 rounded-xl shadow-sm border-l-8 border-indigo-500 border">
               <input 
@@ -124,7 +108,7 @@ function CreateQuiz() {
                     />
                     <input 
                       type="text" placeholder={`${oIndex + 1}. válasz`} required
-                      className="border rounded p-2 flex-1 text-sm"
+                      className="border rounded p-2 flex-1 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                       value={opt} onChange={(e) => updateQuestion(qIndex, 'options', e.target.value, oIndex)}
                     />
                   </div>
@@ -147,7 +131,6 @@ function CreateQuiz() {
               Kvíz Véglegesítése
             </button>
           </div>
-          {message && <p className="text-red-500 text-center font-bold">{message}</p>}
         </form>
       </div>
     </div>
