@@ -8,6 +8,8 @@ function Results() {
 
   // Eredmények lekérése betöltéskor
   useEffect(() => {
+    document.title = "Korábbi Eredményeim";
+
     const fetchResults = async () => {
       const token = localStorage.getItem('token');
       if (!token) {

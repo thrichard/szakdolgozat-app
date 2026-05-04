@@ -8,6 +8,8 @@ function Quizzes() {
 
   // Aktív kvízek lekérése az oldal betöltésekor
   useEffect(() => {
+    document.title = "Elérhető Kvízek";
+
     const fetchQuizzes = async () => {
       const token = localStorage.getItem('token');
       

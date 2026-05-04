@@ -16,6 +16,7 @@ function EditQuiz() {
 
   // Oldal betöltésekor lekérjük a meglévő kvíz adatait
   useEffect(() => {
+    document.title = "Kvíz Szerkesztése";
     fetchQuizData();
   }, [id]);
 

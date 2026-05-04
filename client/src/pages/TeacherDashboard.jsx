@@ -3,10 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 
 function TeacherDashboard() {
   const navigate = useNavigate();
-  // Alapértelmezett megszólítás, ha valamiért nem lenne neve a felhasználónak
   const [username, setUsername] = useState('Oktató');
 
   useEffect(() => {
+    // Visszaállítja a címet, amikor ide érkezünk
+    document.title = "Tanári Pult";
+
     const storedName = localStorage.getItem('username');
     if (storedName) {
       setUsername(storedName);
@@ -16,18 +18,17 @@ function TeacherDashboard() {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
-    localStorage.removeItem('username'); 
+    localStorage.removeItem('username');
     navigate('/login');
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      
       <nav className="bg-indigo-900 text-white p-4 shadow-md flex justify-between items-center">
-        <h1 className="text-xl font-bold">Szakdolgozat Portál - TANÁRI FELÜLET</h1>
+        <h1 className="text-xl font-bold font-mono tracking-tight">Szakdolgozat Portál - TANÁRI PULT</h1>
         <button 
           onClick={handleLogout}
-          className="bg-indigo-700 hover:bg-indigo-600 px-4 py-2 rounded-lg font-medium transition"
+          className="bg-indigo-700 hover:bg-indigo-600 px-4 py-2 rounded-lg font-medium transition shadow-sm"
         >
           Kijelentkezés
         </button>

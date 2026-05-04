@@ -8,6 +8,7 @@ function ManageQuizzes() {
 
   // Az oldal betöltésekor azonnal lekérjük a kvízeket
   useEffect(() => {
+    document.title = "Kvízeim Kezelése";
     fetchQuizzes();
   }, []);
 

@@ -8,6 +8,8 @@ function Materials() {
 
   // Tananyagok lekérése az oldal betöltésekor
   useEffect(() => {
+    document.title = "Tananyagok";
+
     const fetchMaterials = async () => {
       const token = localStorage.getItem('token');
       

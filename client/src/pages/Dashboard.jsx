@@ -7,6 +7,8 @@ function Dashboard() {
 
   // Név kiolvasása betöltéskor
   useEffect(() => {
+    document.title = "Diák Pult";
+    
     const storedName = localStorage.getItem('username');
     if (storedName) {
       setUsername(storedName);

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
 function AddMaterial() {
@@ -10,6 +10,11 @@ function AddMaterial() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
+
+  // Dinamikus böngésző cím beállítása
+  useEffect(() => {
+    document.title = "Tananyag Feltöltése";
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
