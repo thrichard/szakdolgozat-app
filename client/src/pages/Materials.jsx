@@ -18,6 +18,7 @@ function Materials() {
 
       try {
         const response = await fetch('http://localhost:5000/api/materials', {
+          method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -45,7 +46,7 @@ function Materials() {
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-3xl font-extrabold text-gray-800">Tananyagok 📚</h2>
           
-          {/* Vissza gomb */}
+          {/* Az egységesített Vissza gomb */}
           <Link to="/dashboard" className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 rounded-lg hover:bg-indigo-100 transition shadow-sm">
             ← Vissza
           </Link>
@@ -57,7 +58,6 @@ function Materials() {
           </div>
         )}
 
-        {/* Ha még nincs feltöltve semmi */}
         {!error && materials.length === 0 ? (
           <div className="bg-white p-8 rounded-xl border border-gray-200 text-center shadow-sm">
             <p className="text-gray-500 font-medium">Jelenleg nincsenek elérhető tananyagok.</p>
@@ -77,7 +77,7 @@ function Materials() {
                 
                 <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-50">
                   <span className="text-xs text-gray-400 font-medium">
-                    {/* Rövidebb, biztonságosabb lekérdezés a tanár nevére */}
+                    {/* Lekérdezés a tanár nevére */}
                     Oktató: {material.teacherId?.username || 'Ismeretlen'}
                   </span>
                   <a 

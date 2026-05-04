@@ -1,20 +1,15 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 function AddMaterial() {
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    subject: '',
-    link: ''
-  });
+  const [title, setTitle] = useState('');
+  const [subject, setSubject] = useState('');
+  const [description, setDescription] = useState('');
+  const [materialLink, setMaterialLink] = useState('');
+  
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,103 +25,96 @@ function AddMaterial() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({ title, subject, description, link: materialLink })
       });
 
       const data = await response.json();
 
       if (response.ok) {
         setSuccess('Tananyag sikeresen feltöltve!');
-        setFormData({ title: '', description: '', subject: '', link: '' });
-        
-        // 2 másodperc múlva visszadobjuk a tanárt a műszerfalra
         setTimeout(() => {
-          navigate('/teacher'); 
+          navigate('/teacher');
         }, 2000);
       } else {
         setError(data.message || 'Hiba történt a feltöltés során.');
       }
     } catch (err) {
-      setError('Hálózati hiba. Kérjük, próbálja újra később.');
+      setError('Hálózati hiba: Nem sikerült csatlakozni a szerverhez.');
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10 px-4">
-      <div className="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-sm border border-gray-100">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-800">Új Tananyag Feltöltése 📚</h2>
-          <button 
-            onClick={() => navigate(-1)} 
-            className="text-gray-500 hover:text-gray-700"
-          >
-            Vissza
-          </button>
+    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+      <div className="max-w-3xl mx-auto">
+        
+        {/* FEJLÉC ÉS VISSZA GOMB */}
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-3xl font-bold text-gray-800">Új Tananyag Feltöltése 📚</h2>
+          <Link to="/teacher" className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 rounded-lg hover:bg-indigo-100 transition shadow-sm">
+            ← Vissza
+          </Link>
         </div>
 
-        {error && <div className="bg-red-50 text-red-600 p-3 rounded mb-4 text-sm">{error}</div>}
-        {success && <div className="bg-green-50 text-green-600 p-3 rounded mb-4 text-sm">{success}</div>}
+        {error && <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 font-bold border border-red-200">{error}</div>}
+        {success && <div className="bg-green-50 text-green-700 p-3 rounded-lg mb-4 font-bold border border-green-200">{success}</div>}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        {/* AZ ŰRLAP FEHÉR DOBOZA */}
+        <form onSubmit={handleSubmit} className="bg-white p-6 md:p-8 rounded-xl shadow-sm border border-gray-200 space-y-5">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Cím</label>
+            <label className="block text-gray-700 text-sm font-bold mb-2">Cím</label>
             <input
               type="text"
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
               placeholder="pl. Biológia 10. osztály - Sejttan"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Tantárgy</label>
+            <label className="block text-gray-700 text-sm font-bold mb-2">Tantárgy</label>
             <input
               type="text"
-              name="subject"
-              value={formData.subject}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
               placeholder="pl. Biológia"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Leírás</label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
               required
-              rows="4"
-              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              placeholder="Rövid leírás a tananyagról..."
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Fájl vagy Dokumentum Linkje (URL)</label>
+            <label className="block text-gray-700 text-sm font-bold mb-2">Leírás</label>
+            <textarea
+              placeholder="Rövid leírás a tananyagról..."
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition h-28 resize-y"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-gray-700 text-sm font-bold mb-2">Fájl vagy Dokumentum Linkje (URL)</label>
             <input
               type="url"
-              name="link"
-              value={formData.link}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
               placeholder="https://..."
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+              value={materialLink}
+              onChange={(e) => setMaterialLink(e.target.value)}
+              required
             />
           </div>
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 transition"
+            className="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition mt-2 shadow-sm"
           >
             Feltöltés
           </button>
         </form>
+
       </div>
     </div>
   );
