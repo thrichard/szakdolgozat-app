@@ -11,6 +11,7 @@ import AddMaterial from './pages/AddMaterial';
 import CreateQuiz from './pages/CreateQuiz';
 import AllResults from './pages/AllResults';
 import ManageQuizzes from './pages/ManageQuizzes';
+import EditQuiz from './pages/EditQuiz';
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
         <Route path="/create-quiz" element={<CreateQuiz />} />
         <Route path="/all-results" element={<AllResults />} />
         <Route path="/manage-quizzes" element={<ManageQuizzes />} />
+        <Route path="/edit-quiz/:id" element={<EditQuiz />} />
       </Routes>
     </Router>
   );

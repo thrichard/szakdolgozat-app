@@ -85,7 +85,7 @@ function ManageQuizzes() {
               <div>
                 <h3 className="text-xl font-bold text-gray-800 flex items-center gap-3">
                   {quiz.title}
-                  {/* Itt jelenítjük meg az általad kért verziószámot! */}
+                  {/* Verziószám megjelenítése */}
                   <span className="text-xs bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full font-bold">
                     v{quiz.version || 1}.0
                   </span>
@@ -97,13 +97,13 @@ function ManageQuizzes() {
               </div>
               
               <div className="flex gap-2 w-full md:w-auto">
-                {/* A szerkesztés gombot majd a következő lépésben kötjük be */}
-                <button 
+                {/* MÓDOSÍTÁS GOMB */}
+                <Link 
+                  to={`/edit-quiz/${quiz._id}`}
                   className="flex-1 md:flex-none bg-yellow-100 text-yellow-700 px-4 py-2 rounded-lg hover:bg-yellow-200 transition font-bold flex justify-center items-center gap-2"
-                  onClick={() => alert('Szerkesztés (Módosítás) funkció hamarosan épül!')}
                 >
                   ✏️ Módosítás
-                </button>
+                </Link>
                 <button 
                   onClick={() => handleDelete(quiz._id)} 
                   className="flex-1 md:flex-none bg-red-100 text-red-700 px-4 py-2 rounded-lg hover:bg-red-200 transition font-bold flex justify-center items-center gap-2"
