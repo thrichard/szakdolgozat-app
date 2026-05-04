@@ -106,7 +106,7 @@ function EditQuiz() {
       <div className="max-w-3xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-3xl font-bold text-gray-800">Kvíz Módosítása ✏️</h2>
-          <Link to="/manage-quizzes" className="text-indigo-600 hover:underline">Mégsem</Link>
+          <Link to="/manage-quizzes" className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition shadow-sm">  ← Mégsem</Link>
         </div>
 
         {error && <div className="bg-red-50 text-red-600 p-3 rounded mb-4 text-sm font-bold">{error}</div>}

@@ -61,7 +61,9 @@ function CreateQuiz() {
       <div className="max-w-3xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-3xl font-bold text-gray-800">Új Kvíz Összeállítása</h2>
-          <Link to="/teacher" className="text-indigo-600 hover:underline">Vissza</Link>
+          <Link to="/teacher" className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 rounded-lg hover:bg-indigo-100 transition shadow-sm">
+              ← Vissza
+            </Link>
         </div>
 
         {error && <div className="bg-red-50 text-red-600 p-3 rounded mb-4 text-sm font-bold">{error}</div>}

@@ -1,9 +1,3 @@
-/**
- * Bejelentkezési felület komponense.
- * Kezeli a felhasználói hitelesítést, a JWT (JSON Web Token) kliensoldali tárolását (localStorage),
- * valamint a dekódolt token alapján a szerepkör-specifikus (RBAC) átirányítást.
- */
-
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
@@ -27,15 +21,22 @@ function Login() {
       const data = await response.json();
 
       if (response.ok) {
-        // Sikeres hitelesítés esetén a token perzisztens tárolása
+        // Token mentése
         localStorage.setItem('token', data.token);
 
-        // JWT Payload dekódolása (Base64) a felhasználói szerepkör kinyeréséhez
-        const tokenPayload = data.token.split('.')[1];
-        const decodedPayload = JSON.parse(atob(tokenPayload));
+        // Kinyerjük a tokenből az adatokat
+        const payload = JSON.parse(atob(data.token.split('.')[1]));
+        const role = payload.role;
+        
+        // Név megkeresése ahonnan épp jön, vagy alapértelmezett érték
+        const username = payload.username || data?.user?.username || data?.username || 'Tanár Úr/Nő';
 
-        // Szerepkör alapú átirányítás (Role-based redirection)
-        if (decodedPayload.role === 'teacher') {
+        // Szükséges infók mentése a felülethez
+        localStorage.setItem('role', role);
+        localStorage.setItem('username', username);
+
+        // Átirányítás szerepkör alapján
+        if (role === 'teacher') {
           navigate('/teacher');
         } else {
           navigate('/dashboard');
@@ -44,14 +45,14 @@ function Login() {
         setError(data.message || 'Helytelen belépési adatok.');
       }
     } catch (err) {
-      setError('Hálózati hiba. Nem sikerült csatlakozni a szerverhez.');
+      setError('Hiba történt. Kérlek, ellenőrizd az internetkapcsolatod.');
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md border border-gray-100">
-        <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Rendszer Bejelentkezés</h2>
+        <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Bejelentkezés</h2>
         
         {error && <p className="text-red-500 text-sm mb-4 text-center bg-red-50 p-2 rounded">{error}</p>}
         
@@ -80,12 +81,12 @@ function Login() {
             type="submit" 
             className="w-full bg-blue-600 text-white font-bold py-2 rounded-lg hover:bg-blue-700 transition"
           >
-            Bejelentkezés
+            Belépés
           </button>
         </form>
 
         <p className="mt-4 text-center text-sm text-gray-600">
-          Nincs még fiókja? <Link to="/register" className="text-blue-600 hover:underline">Regisztráció</Link>
+          Nincs még fiókod? <Link to="/register" className="text-blue-600 hover:underline">Regisztráció</Link>
         </p>
       </div>
     </div>

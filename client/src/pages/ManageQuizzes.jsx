@@ -62,9 +62,9 @@ function ManageQuizzes() {
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-3xl font-bold text-gray-800">Kvízeim Kezelése ⚙️</h2>
-          <Link to="/teacher" className="text-indigo-600 hover:underline font-medium">
-            Vissza a pultra
-          </Link>
+          <Link to="/teacher" className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 rounded-lg hover:bg-indigo-100 transition shadow-sm">
+              ← Vissza
+            </Link>
         </div>
 
         {loading && <div className="text-center text-gray-500 py-10">Kvízek betöltése...</div>}
