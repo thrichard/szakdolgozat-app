@@ -9,7 +9,7 @@ function AllResults() {
 
   // Eredmények lekérése az oldal betöltésekor
   useEffect(() => {
-    document.title = "Osztálynapló | Szakdolgozat Portál"; 
+    document.title = "Osztálynapló"; 
     
     const fetchAllResults = async () => {
       const token = localStorage.getItem('token');
