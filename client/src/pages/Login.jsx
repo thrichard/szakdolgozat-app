@@ -9,7 +9,7 @@ function Login() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    document.title = "Bejelentkezés | Szakdolgozat Portál";
+    document.title = "Bejelentkezés";
   }, []);
 
   const handleSubmit = async (e) => {

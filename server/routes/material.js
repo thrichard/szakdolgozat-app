@@ -40,6 +40,19 @@ router.get('/', authMiddleware, async (req, res) => {
   }
 });
 
+// EGY ADOTT TANANYAG LEKÉRDEZÉSE (Ez hiányzott a szerkesztés betöltéséhez!)
+router.get('/:id', authMiddleware, async (req, res) => {
+  try {
+    const material = await Material.findById(req.params.id);
+    if (!material) {
+      return res.status(404).json({ message: 'A tananyag nem található.' });
+    }
+    res.status(200).json(material);
+  } catch (error) {
+    res.status(500).json({ error: 'Szerverhiba a tananyag lekérdezésekor.' });
+  }
+});
+
 // Tananyag módosítása
 router.put('/:id', authMiddleware, async (req, res) => {
   try {

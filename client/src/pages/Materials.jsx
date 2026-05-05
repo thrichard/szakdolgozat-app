@@ -10,7 +10,7 @@ function Materials() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    document.title = "Tananyagok | Szakdolgozat Portál";
+    document.title = "Tananyagok";
 
     const fetchMaterials = async () => {
       const token = localStorage.getItem("token");
