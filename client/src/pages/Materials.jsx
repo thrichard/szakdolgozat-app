@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
+// 1. IMPORTÁLJUK A KÓDSZÍNEZŐT ÉS A TÉMÁT
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
+
 function Materials() {
   const [materials, setMaterials] = useState([]);
   const [error, setError] = useState("");
-
-  // Állapot a kiválasztott (épp nagyban megnyitott) tananyaghoz
   const [selectedMaterial, setSelectedMaterial] = useState(null);
   const navigate = useNavigate();
 
@@ -43,7 +45,6 @@ function Materials() {
     fetchMaterials();
   }, [navigate]);
 
-  // Modal bezárása
   const closeModal = () => {
     setSelectedMaterial(null);
   };
@@ -95,7 +96,6 @@ function Materials() {
                   {material.title}
                 </h3>
 
-                {/* A line-clamp-3 CSS osztály biztosítja, hogy maximum 3 sor jelenjen meg, utána ... lesz */}
                 <p className="text-gray-600 text-sm mb-4 line-clamp-3 flex-grow">
                   {material.description}
                 </p>
@@ -105,7 +105,6 @@ function Materials() {
                     Oktató: {material.teacherId?.username || "Ismeretlen"}
                   </span>
 
-                  {/* Itt már nem külső linkre visz, hanem megnyitja a modalt */}
                   <button
                     onClick={() => setSelectedMaterial(material)}
                     className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition text-sm flex-shrink-0 shadow-sm"
@@ -119,12 +118,10 @@ function Materials() {
         )}
       </div>
 
-      {/* MODAL (Felugró ablak) - Csak akkor renderelődik, ha van kiválasztott anyag */}
+      {/* MODAL (Felugró ablak) */}
       {selectedMaterial && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900 bg-opacity-60 backdrop-blur-sm">
-          {/* Animált, fehér doboz */}
           <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-fade-in-up">
-            {/* Modal Fejléc */}
             <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
               <div>
                 <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-bold rounded-md uppercase tracking-wider mb-1 inline-block">
@@ -136,23 +133,40 @@ function Materials() {
               </div>
               <button
                 onClick={closeModal}
-                className="text-gray-400 hover:text-gray-600 hover:bg-gray-200 p-2 rounded-full transition"
+                className="text-gray-400 hover:text-gray-600 hover:bg-gray-200 p-2 rounded-full transition font-bold"
                 title="Bezárás"
               >
                 ✕
               </button>
             </div>
 
-            {/* Modal Tartalom (Görgethető, ha túl hosszú a szöveg) */}
-            <div className="p-6 overflow-y-auto flex-grow text-gray-700 whitespace-pre-wrap leading-relaxed">
-              <p>{selectedMaterial.description}</p>
-              <div className="mt-6 text-sm text-gray-500 font-medium">
+            <div className="p-6 overflow-y-auto flex-grow text-gray-700 leading-relaxed">
+              
+              {/* 1. Sima leíró szöveg */}
+              <p className="text-base whitespace-pre-wrap">
+                {selectedMaterial.description}
+              </p>
+
+              {/* 2. KÜLÖN KÓDBLOKK - Csak akkor jelenik meg, ha a tanár adott meg kódot! */}
+              {selectedMaterial.codeSnippet && selectedMaterial.codeSnippet.trim() !== "" && (
+                <div className="mt-6 text-sm rounded-lg overflow-hidden shadow-lg font-mono text-left">
+                  <SyntaxHighlighter 
+                    language={selectedMaterial.language || "c"} 
+                    style={vscDarkPlus} 
+                    showLineNumbers={true}
+                    customStyle={{ margin: 0, borderRadius: '0.5rem' }}
+                  >
+                    {selectedMaterial.codeSnippet}
+                  </SyntaxHighlighter>
+                </div>
+              )}
+
+              <div className="mt-8 text-sm text-gray-400 font-medium border-t border-gray-100 pt-4">
                 Feltöltötte:{" "}
                 {selectedMaterial.teacherId?.username || "Ismeretlen oktató"}
               </div>
             </div>
 
-            {/* Modal Lábjegyzet / Gombok */}
             <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex flex-col sm:flex-row justify-end gap-3">
               <button
                 onClick={closeModal}
@@ -161,7 +175,6 @@ function Materials() {
                 Vissza
               </button>
 
-              {/* Csak akkor jelenik meg a gomb, ha tényleg van link */}
               {selectedMaterial.link && selectedMaterial.link.trim() !== "" && (
                 <a
                   href={selectedMaterial.link}

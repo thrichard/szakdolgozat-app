@@ -91,11 +91,19 @@ function ManageMaterials() {
             <div key={material._id} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 hover:shadow-md transition">
               
               <div className="flex-grow">
-                <div className="flex items-center gap-3 mb-2">
+                <div className="flex items-center gap-3 mb-2 flex-wrap">
                   <span className="px-2.5 py-1 bg-blue-100 text-blue-800 text-xs font-bold rounded-md uppercase tracking-wider">
                     {material.subject}
                   </span>
+                  
+                  {/* ÚJ: Jelvény, ha a tananyag tartalmaz kódot */}
+                  {material.codeSnippet && material.codeSnippet.trim() !== "" && (
+                    <span className="px-2.5 py-1 bg-gray-800 text-green-400 text-xs font-bold rounded-md uppercase tracking-wider flex items-center gap-1">
+                      👨‍💻 Kód csatolva
+                    </span>
+                  )}
                 </div>
+                
                 <h3 className="text-xl font-bold text-gray-800 mb-2">{material.title}</h3>
                 <p className="text-gray-500 text-sm mb-3 line-clamp-2">{material.description}</p>
                 
