@@ -85,54 +85,78 @@ router.put('/:id', authMiddleware, async (req, res) => {
 // 5. Kvíz törlése
 router.delete('/:id', authMiddleware, async (req, res) => {
   try {
+    // megnézzük, létezik-e egyáltalán
     const quiz = await Quiz.findById(req.params.id);
-    if (!quiz) return res.status(404).json({ message: 'A kvíz nem található.' });
-    if (quiz.teacherId.toString() !== req.user.id) {
-      return res.status(403).json({ message: 'Nincs jogosultságod ezt a kvízt törölni.' });
+    if (!quiz) return res.status(404).json({ message: 'Nincs ilyen kvíz.' });
+
+    // Ellenőrizzük, hogy tényleg tanár-e aki törölni akar
+    if (req.user.role !== 'teacher') {
+      return res.status(403).json({ message: 'Csak oktatók törölhetnek!' });
     }
+
+    // Opcionális: Ha azt akarod, hogy bárki törölhesse aki tanár, hagyd így.
+    // Ha csak a sajátját törölhetné, akkor: quiz.teacherId.equals(req.user.id)
+
+    // Törlünk mindent, ami ehhez a kvízhez tartozik (kérdések, eredmények)
     await Quiz.findByIdAndDelete(req.params.id);
     await Question.deleteMany({ quizId: req.params.id });
-    res.json({ message: 'Kvíz és a hozzá tartozó kérdések sikeresen törölve.' });
+    await Result.deleteMany({ quizId: req.params.id }); // Kitakarítjuk a régi XP-ket is
+
+    res.json({ message: 'Kvíz és minden adata törölve.' });
   } catch (err) {
-    res.status(500).json({ error: 'Szerverhiba a törlés során.' });
+    console.log("Törlési hiba:", err);
+    res.status(500).json({ error: 'Szerverhiba a törléskor.' });
   }
 });
 
-// 6. DIÁK VÁLASZAINAK BEKÜLDÉSE + XP SZÁMÍTÁS
+// 6. diak valaszainak bekuldese
 router.post('/:id/submit', authMiddleware, async (req, res) => {
   try {
     const { answers } = req.body;
     const questions = await Question.find({ quizId: req.params.id });
 
     let score = 0;
-    questions.forEach((question, index) => {
-      if (answers[index] === question.correctAnswerIndex) {
-        score++;
-      }
+    questions.forEach((q, index) => {
+      if (answers[index] === q.correctAnswerIndex) score++;
     });
 
-    const percentage = Math.round((score / questions.length) * 100);
-    
-    // 1. Eredmény mentése
-    const newResult = new Result({
+    const percent = Math.round((score / questions.length) * 100);
+
+    // --- ÚJ LOGIKA: Megkeressük az eddigi legjobb eredményét ---
+    const previousResults = await Result.find({
+      studentId: req.user.id,
+      quizId: req.params.id
+    });
+
+    let maxPreviousPercent = 0;
+    if (previousResults.length > 0) {
+      maxPreviousPercent = Math.max(...previousResults.map(r => r.percentage));
+    }
+
+    // Csak a KÜLÖNBSÉGET kapja meg XP-ben, ha jobbat írt, mint a rekordja
+    let gainedXp = 0;
+    if (percent > maxPreviousPercent) {
+      gainedXp = percent - maxPreviousPercent;
+    }
+
+    // 1. Eredmeny mentese
+    const result = new Result({
       studentId: req.user.id,
       quizId: req.params.id,
       score,
       totalQuestions: questions.length,
-      percentage
+      percentage: percent
     });
-    await newResult.save();
+    await result.save();
 
-    // 2. SZINTLÉPÉS LOGIKA
+    // 2. XP es szintlepes
     const student = await User.findById(req.user.id);
     let leveledUp = false;
-    let gainedXp = percentage; // Alapképlet: 1% = 1 XP
 
-    if (student) {
+    if (gainedXp > 0 && student) {
       student.xp += gainedXp;
 
-      // Szintlépés ellenőrzése: amíg az XP eléri a küszöböt (Level * 100), szintet lép
-      // 1. szintről 2-re 100 XP kell. 2-ről 3-ra 200 XP kell.
+      // amig az xp eleri a kovetkezo szint hatarat, noveljuk a szintet
       while (student.xp >= student.level * 100) {
         student.level += 1;
         leveledUp = true;
@@ -141,19 +165,19 @@ router.post('/:id/submit', authMiddleware, async (req, res) => {
       await student.save();
     }
 
-    // 3. Válasz küldése a frontendnek az új adatokkal
-    res.status(200).json({
-      result: newResult,
+    res.json({
+      result,
       gainedXp,
-      totalXp: student ? student.xp : 0,
-      currentLevel: student ? student.level : 1,
-      leveledUp
+      totalXp: student?.xp || 0,
+      currentLevel: student?.level || 1,
+      leveledUp,
+      isRetake: previousResults.length > 0, // Igaz, ha már próbálta korábban
+      improved: gainedXp > 0                // Igaz, ha most új rekordot döntött
     });
 
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Hiba az eredmény kiértékelése során.' });
+    console.log(err);
+    res.status(500).json({ error: 'Hiba a kiértékelésnél' });
   }
 });
-
 module.exports = router;
