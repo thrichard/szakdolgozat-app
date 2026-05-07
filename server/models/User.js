@@ -1,44 +1,51 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema(
   {
     username: {
       type: String,
-      required: true, // Kötelező megadni
-      trim: true,     // Eltávolítja a szóközöket az elejéről és a végéről
-      minlength: 3    // Legalább 3 karakter hosszú kell legyen
+      required: true,
+      trim: true,
+      minlength: 3
     },
     email: {
       type: String,
       required: true,
-      unique: true,   // Nem regisztrálhat két ember ugyanazzal az emaillel
+      unique: true,
       trim: true,
-      lowercase: true // Mindig kisbetűssé alakítja mentés előtt
+      lowercase: true
     },
     password: {
       type: String,
       required: true,
-      minlength: 6    // Biztonsági okokból legalább 6 karakter
+      minlength: 6
     },
     role: {
       type: String,
-      enum: ['student', 'teacher'], // CSAK ez a két érték lehet
-      default: 'student'            // Ha nem adunk meg semmit, alapból diák lesz
+      enum: ['student', 'teacher'],
+      default: 'student'
+    },
+    // --- GAMIFIKÁCIÓS MEZŐK ---
+    xp: {
+      type: Number,
+      default: 0 // Mindenki nulláról indul
+    },
+    level: {
+      type: Number,
+      default: 1 // Az 1. szintről indulnak
     }
   },
   { 
-    timestamps: true // Ez egy varázsszó: automatikusan létrehoz és frissít egy 'createdAt' és 'updatedAt' dátumot minden felhasználónál!
+    timestamps: true 
   }
 );
-const bcrypt = require('bcryptjs');
 
-// Mielőtt elmentjük a felhasználót...
+
 userSchema.pre('save', async function() {
-  // Csak akkor titkosítunk, ha a jelszó megváltozott (vagy új)
   if (!this.isModified('password')) return;
-
-  // "Sózás" és Hash-elés
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 });
+
 module.exports = mongoose.model('User', userSchema);

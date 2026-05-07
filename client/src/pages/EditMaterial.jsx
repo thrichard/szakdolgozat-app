@@ -8,7 +8,7 @@ function EditMaterial() {
   const [description, setDescription] = useState('');
   const [materialLink, setMaterialLink] = useState('');
   
-  // ÚJ: Állapotok a kódnak és a nyelvnek
+  //  Állapotok a kódnak és a nyelvnek
   const [codeSnippet, setCodeSnippet] = useState('');
   const [language, setLanguage] = useState('c');
   

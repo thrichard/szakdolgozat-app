@@ -7,8 +7,6 @@ function AddMaterial() {
   const [description, setDescription] = useState("");
   const [materialLink, setMaterialLink] = useState("");
   const [codeSnippet, setCodeSnippet] = useState("");
-  
-  // ÚJ: Állapot a nyelv kiválasztásához (alapból "c")
   const [language, setLanguage] = useState("c");
 
   const [error, setError] = useState("");
@@ -39,7 +37,6 @@ function AddMaterial() {
           description,
           link: materialLink,
           codeSnippet,
-          // ÚJ: Elküldjük a kiválasztott nyelvet is!
           language, 
         }),
       });
@@ -113,7 +110,6 @@ function AddMaterial() {
             />
           </div>
 
-          {/* ÚJ: Két oszlop a Nyelv kiválasztásához és a Kódhoz */}
           <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-3 gap-3">
               <label className="block text-gray-800 font-bold">
