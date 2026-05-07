@@ -82,30 +82,62 @@ router.put('/:id', authMiddleware, async (req, res) => {
   }
 });
 
-// 5. Kvíz törlése
+// 5. Kvíz törlése (XP és Szint visszavonásával)
 router.delete('/:id', authMiddleware, async (req, res) => {
   try {
-    // megnézzük, létezik-e egyáltalán
     const quiz = await Quiz.findById(req.params.id);
-    if (!quiz) return res.status(404).json({ message: 'Nincs ilyen kvíz.' });
+    if (!quiz) return res.status(404).json({ message: 'A kvíz nem található.' });
 
-    // Ellenőrizzük, hogy tényleg tanár-e aki törölni akar
     if (req.user.role !== 'teacher') {
-      return res.status(403).json({ message: 'Csak oktatók törölhetnek!' });
+      return res.status(403).json({ message: 'Nincs jogosultságod ezt a kvízt törölni.' });
     }
 
-    // Opcionális: Ha azt akarod, hogy bárki törölhesse aki tanár, hagyd így.
-    // Ha csak a sajátját törölhetné, akkor: quiz.teacherId.equals(req.user.id)
+    // 1. Kikeresük az összes eredményt, ami ehhez a kvízhez tartozik
+    const results = await Result.find({ quizId: req.params.id });
 
-    // Törlünk mindent, ami ehhez a kvízhez tartozik (kérdések, eredmények)
+    // 2. Kigyűjtjük diákonként a MAX pontszámot (mivel a legjobb kitöltésért járt az XP)
+    const maxScoresByUser = {};
+    results.forEach(result => {
+      const sId = result.studentId.toString();
+      if (!maxScoresByUser[sId] || result.percentage > maxScoresByUser[sId]) {
+        maxScoresByUser[sId] = result.percentage;
+      }
+    });
+
+    // 3. Minden érintett diáktól levonjuk az XP-t, és beállítjuk az új szintet
+    for (const studentId in maxScoresByUser) {
+      const student = await User.findById(studentId);
+      if (student) {
+        const xpToDeduct = maxScoresByUser[studentId];
+        
+        // XP csökkentése (biztosítjuk, hogy ne menjen mínuszba)
+        student.xp = Math.max(0, student.xp - xpToDeduct); 
+        
+        // Szint VISSZASZÁMOLÁSA az RPG matek alapján
+        let newLevel = 1;
+        let tempXp = student.xp;
+        let needed = 100;
+        
+        while (tempXp >= needed) {
+          tempXp -= needed;
+          newLevel++;
+          needed = newLevel * 100;
+        }
+        student.level = newLevel; 
+        
+        await student.save();
+      }
+    }
+
+    // 4. Biztonságosan törölhetünk mindent a kukába
     await Quiz.findByIdAndDelete(req.params.id);
     await Question.deleteMany({ quizId: req.params.id });
-    await Result.deleteMany({ quizId: req.params.id }); // Kitakarítjuk a régi XP-ket is
+    await Result.deleteMany({ quizId: req.params.id });
 
-    res.json({ message: 'Kvíz és minden adata törölve.' });
+    res.json({ message: 'Kvíz törölve, diákok XP-je és szintje korrigálva.' });
   } catch (err) {
-    console.log("Törlési hiba:", err);
-    res.status(500).json({ error: 'Szerverhiba a törléskor.' });
+    console.log(err);
+    res.status(500).json({ error: 'Szerverhiba a törlés során.' });
   }
 });
 
@@ -122,7 +154,7 @@ router.post('/:id/submit', authMiddleware, async (req, res) => {
 
     const percent = Math.round((score / questions.length) * 100);
 
-    // --- ÚJ LOGIKA: Megkeressük az eddigi legjobb eredményét ---
+    // Megkeressük az eddigi legjobb eredményét
     const previousResults = await Result.find({
       studentId: req.user.id,
       quizId: req.params.id
@@ -156,9 +188,19 @@ router.post('/:id/submit', authMiddleware, async (req, res) => {
     if (gainedXp > 0 && student) {
       student.xp += gainedXp;
 
-      // amig az xp eleri a kovetkezo szint hatarat, noveljuk a szintet
-      while (student.xp >= student.level * 100) {
-        student.level += 1;
+      // RPG szintlépés logika
+      let newLevel = 1;
+      let tempXp = student.xp;
+      let needed = 100;
+      
+      while (tempXp >= needed) {
+        tempXp -= needed;
+        newLevel++;
+        needed = newLevel * 100;
+      }
+
+      if (newLevel > student.level) {
+        student.level = newLevel;
         leveledUp = true;
       }
       
@@ -180,4 +222,5 @@ router.post('/:id/submit', authMiddleware, async (req, res) => {
     res.status(500).json({ error: 'Hiba a kiértékelésnél' });
   }
 });
+
 module.exports = router;

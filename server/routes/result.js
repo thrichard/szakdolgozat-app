@@ -17,7 +17,10 @@ router.get('/all', auth, async (req, res) => {
       .populate('quizId', 'title')
       .sort({ createdAt: -1 }); 
 
-    res.json(results);
+    // Kiszűrjük azokat a kvízeket amiket töröltek)
+    const validResults = results.filter(r => r.quizId != null);
+
+    res.json(validResults);
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: 'Szerverhiba az adatok lekérdezésekor.' });
@@ -32,7 +35,10 @@ router.get('/', auth, async (req, res) => {
       .populate('quizId', 'title')
       .sort({ createdAt: -1 });
       
-    res.json(results);
+    // Kiszűrjük a "szellem" eredményeket a diáknál is
+    const validResults = results.filter(r => r.quizId != null);
+
+    res.json(validResults);
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: 'Szerverhiba.' });
