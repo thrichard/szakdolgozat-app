@@ -2,9 +2,11 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const Quiz = require('./models/Quiz');
 const User = require('./models/User');
+const Question = require('./models/Question');
 
 dotenv.config();
 
+// ITT VANNAK A KÉRDÉSEK:
 const quizzesData = [
   {
     weekNumber: 1,
@@ -205,13 +207,13 @@ const quizzesData = [
   }
 ];
 
+// ITT VAN A LOGIKA:
 const seedQuizzes = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI);
     console.log('✅ Sikeres adatbázis kapcsolat!');
 
     const teacher = await User.findOne({ role: 'teacher' });
-    
     if (!teacher) {
       console.log('❌ Nincs tanár az adatbázisban!');
       process.exit(1);
@@ -219,18 +221,36 @@ const seedQuizzes = async () => {
 
     console.log(`👨‍🏫 Kijelölt tanár a kvízekhez: ${teacher.username}`);
 
-    // Letöröljük a korábbi generált C kvízeket, hogy ne duplikálódjanak
+    // Tiszta lap: Törlünk mindent a Kvízekből ÉS a Kérdésekből is
     await Quiz.deleteMany({ title: { $regex: 'Hét:' } });
-    console.log('🗑️ Korábbi teszt kvízek törölve.');
+    await Question.deleteMany({}); 
+    console.log('🗑️ Korábbi teszt adatok törölve.');
 
-    // Hozzáadjuk a teacherId-t a kvízekhez
-    const quizzesWithTeacher = quizzesData.map(quiz => ({
-      ...quiz,
-      teacherId: teacher._id
-    }));
+    // Kvízek és Kérdések mentése külön-külön
+    for (const quizItem of quizzesData) {
+      // 1. Kvíz mentése (kérdések nélkül)
+      const newQuiz = new Quiz({
+        weekNumber: quizItem.weekNumber,
+        title: quizItem.title,
+        description: quizItem.description,
+        difficulty: quizItem.difficulty,
+        teacherId: teacher._id
+      });
+      const savedQuiz = await newQuiz.save();
 
-    await Quiz.insertMany(quizzesWithTeacher);
-    console.log('🚀 SIKER! Mind a 14 hét kvíze feltöltve!');
+      // 2. Kérdések mentése a savedQuiz._id-val összekötve
+      const questionsToInsert = quizItem.questions.map(q => ({
+        quizId: savedQuiz._id,
+        questionText: q.questionText,
+        options: q.options,
+        correctAnswerIndex: q.correctAnswerIndex
+      }));
+
+      await Question.insertMany(questionsToInsert);
+      console.log(`📍 ${quizItem.title} feltöltve (${questionsToInsert.length} kérdéssel).`);
+    }
+
+    console.log('🚀 SIKER! Minden kvíz és kérdés szétválogatva feltöltve!');
 
   } catch (err) {
     console.error('❌ Hiba történt:', err);

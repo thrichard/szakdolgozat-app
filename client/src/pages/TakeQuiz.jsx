@@ -11,6 +11,7 @@ function TakeQuiz() {
   const [answers, setAnswers] = useState([]); 
   const [resultData, setResultData] = useState(null);
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(true); // ÚJ: Dedikált töltő állapot!
 
   useEffect(() => {
     const fetchQuizData = async () => {
@@ -20,21 +21,31 @@ function TakeQuiz() {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await response.json();
+        // --- EZT AZ EGY SORT ADD HOZZÁ ---
+        console.log("A BACKEND VÁLASZA:", data); 
+        // ---------------------------------
         
         if (response.ok) {
-          setQuiz(data.quiz);
-          setQuestions(data.questions);
-          document.title = `${data.quiz.title} - Kitöltés | Szakdolgozat Portál`;
+          //  Ha a backend 'data.quiz'-t küld azt használja, ha csak 'data'-t, akkor azt!
+          const actualQuiz = data.quiz ? data.quiz : data;
+          const actualQuestions = data.questions ? data.questions : (actualQuiz.questions || []);
+
+          setQuiz(actualQuiz);
+          setQuestions(actualQuestions);
+          document.title = `${actualQuiz.title} - Kitöltés | Szakdolgozat Portál`;
         } else {
           setError(data.message || 'Hiba az adatok betöltésekor.');
         }
       } catch (err) {
         console.log(err);
         setError('Hálózati hiba történt.');
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchQuizData();
   }, [id]);
+
 
   const handleAnswer = (optionIndex) => {
     const newAnswers = [...answers];
@@ -80,14 +91,18 @@ function TakeQuiz() {
   };
 
   if (error) return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="bg-red-50 border border-red-200 text-red-700 p-6 rounded-xl font-bold text-center shadow-sm max-w-md w-full">
-        ⚠️ {error}
-        <button onClick={() => navigate('/dashboard')} className="mt-4 w-full bg-red-100 hover:bg-red-200 text-red-800 py-2 rounded-lg transition">Vissza a pultra</button>
-      </div>
+    "hiba"
+  );
+
+  // ÚJ BETÖLTÉSI LOGIKA:
+  if (isLoading) return <div className="min-h-screen bg-gray-50 flex items-center justify-center font-bold text-gray-500">Vizsga betöltése... ⏳</div>;
+  
+  if (!quiz || questions.length === 0) return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center font-bold text-gray-500">
+      Ebben a kvízben még nincsenek kérdések! 📝
+      <button onClick={() => navigate('/dashboard')} className="ml-4 text-indigo-600 underline">Vissza</button>
     </div>
   );
-  if (!quiz || questions.length === 0) return <div className="min-h-screen bg-gray-50 flex items-center justify-center font-bold text-gray-500">Vizsga betöltése... ⏳</div>;
 
   const progressPercentage = ((currentQuestion + 1) / questions.length) * 100;
 

@@ -14,7 +14,13 @@ const quizSchema = new mongoose.Schema({
   
   weekNumber: { type: Number, min: 1, max: 14 }, 
   
-  questions: [questionSchema],
+  questions: [
+    {
+      questionText: { type: String, required: true },
+      options: [{ type: String, required: true }],
+      correctAnswerIndex: { type: Number, required: true }
+    }
+  ],
   teacherId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   createdAt: { type: Date, default: Date.now }
 });
