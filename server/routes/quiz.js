@@ -33,7 +33,7 @@ router.post('/', authMiddleware, async (req, res) => {
 // 2. Összes kvíz lekérdezése
 router.get('/', authMiddleware, async (req, res) => {
   try {
-    const quizzes = await Quiz.find().populate('teacherId', 'username').sort({ createdAt: -1 });
+    const quizzes = await Quiz.find().populate('teacherId', 'username').sort({weekNumber: 1, createdAt: -1 });
     res.status(200).json(quizzes);
   } catch (err) {
     res.status(500).json({ error: 'Szerverhiba az adatok lekérdezésekor.' });
