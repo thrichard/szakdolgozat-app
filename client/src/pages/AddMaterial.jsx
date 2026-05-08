@@ -81,7 +81,7 @@ function AddMaterial() {
             <label className="block text-gray-700 text-sm font-bold mb-2">Cím</label>
             <input
               type="text"
-              placeholder="pl. Biológia 10. osztály - Sejttan"
+              placeholder="pl. C nyelv"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -94,7 +94,7 @@ function AddMaterial() {
               <label className="block text-gray-700 text-sm font-bold mb-2">Tantárgy</label>
               <input
                 type="text"
-                placeholder="pl. Biológia"
+                placeholder="pl. IT"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
