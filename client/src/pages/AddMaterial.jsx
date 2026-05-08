@@ -4,6 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 function AddMaterial() {
   const [title, setTitle] = useState("");
   const [subject, setSubject] = useState("");
+  const [weekNumber, setWeekNumber] = useState(1);
   const [description, setDescription] = useState("");
   const [materialLink, setMaterialLink] = useState("");
   const [codeSnippet, setCodeSnippet] = useState("");
@@ -34,6 +35,7 @@ function AddMaterial() {
         body: JSON.stringify({
           title,
           subject,
+          weekNumber: Number(weekNumber),
           description,
           link: materialLink,
           codeSnippet,
@@ -87,16 +89,33 @@ function AddMaterial() {
             />
           </div>
 
-          <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2">Tantárgy</label>
-            <input
-              type="text"
-              placeholder="pl. Biológia"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              required
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-gray-700 text-sm font-bold mb-2">Tantárgy</label>
+              <input
+                type="text"
+                placeholder="pl. Biológia"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 text-sm font-bold mb-2">Melyik hétre szól?</label>
+              <select
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition bg-white"
+                value={weekNumber}
+                onChange={(e) => setWeekNumber(e.target.value)}
+                required
+              >
+                {[...Array(14)].map((_, index) => (
+                  <option key={index + 1} value={index + 1}>
+                    {index + 1}. Hét
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div>
@@ -119,7 +138,7 @@ function AddMaterial() {
               <div className="flex items-center gap-2">
                 <label className="text-sm text-gray-600 font-bold">Nyelv:</label>
                 <select 
-                  className="px-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm font-medium"
+                  className="px-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm font-medium bg-white"
                   value={language}
                   onChange={(e) => setLanguage(e.target.value)}
                 >
